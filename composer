@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+./tools/composer/install.sh
+
+php ./tools/composer/composer.phar $@
