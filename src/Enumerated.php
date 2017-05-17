@@ -39,7 +39,7 @@ abstract class Enumerated implements ValueHolder
     /**
      * @return string
      */
-    public function __toString()
+    final public function __toString()
     {
         return (string) $this->value;
     }
@@ -47,15 +47,14 @@ abstract class Enumerated implements ValueHolder
     /**
      * static initializer to set up all enum values
      */
-    public static function init()
+    final public static function init()
     {
         $reflect = static::getReflection();
-        /** @var array $staticProps */
-        $props = $reflect->getStaticProperties();
+        $props   = $reflect->getStaticProperties();
 
         foreach ($props as $name => $val) {
             $inst        = new static();
-            $inst->value = $name;
+            $inst->value = (string) $name;
             $reflect->setStaticPropertyValue($name, $inst);
         }
     }
@@ -68,9 +67,9 @@ abstract class Enumerated implements ValueHolder
      *
      * @return static
      */
-    public static function void()
+    final public static function void()
     {
-        return static::from(null);
+        return self::from(null);
     }
 
     /**
@@ -80,7 +79,7 @@ abstract class Enumerated implements ValueHolder
      *
      * @return static
      */
-    public static function from($value)
+    final public static function from($value)
     {
         $value = (string) $value;
 
@@ -111,17 +110,17 @@ abstract class Enumerated implements ValueHolder
     /**
      * @return string[]
      */
-    public static function enumerateValues()
+    final public static function enumerateValues()
     {
         return array_keys(static::enumerateProps());
     }
 
     /**
-     * @return static[]
+     * @return array|Enumerated[]
      */
-    protected static function enumerateProps()
+    private static function enumerateProps()
     {
-        return static::getReflection()->getStaticProperties();
+        return self::getReflection()->getStaticProperties();
     }
 
     /**
