@@ -47,6 +47,16 @@ class LocalTimeslot
     }
 
     /**
+     * LocalTimeslot cannot be constructed directly.
+     *
+     * @see from()
+     * @see createEmpty()
+     */
+    protected function __construct()
+    {
+    }
+
+    /**
      * @return string
      */
     public function __toString()
@@ -156,17 +166,17 @@ class LocalTimeslot
     public function getDurationInSecs()
     {
         if ($this->from && $this->to) {
-            return $this->from->getTimestamp() - $this->to->getTimestamp();
+            return $this->to->getTimestamp() - $this->from->getTimestamp();
         }
 
         return 0;
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getDurationInMins()
     {
-        return (int) ($this->getDurationInSecs() / 60);
+        return $this->getDurationInSecs() / 60;
     }
 }
