@@ -6,5 +6,6 @@
 dataSources.ids
 datasources.xml
 
+/build/
 /tmp/
 /vendor/

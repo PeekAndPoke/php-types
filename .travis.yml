@@ -1,0 +1,32 @@
+language: php
+php:
+  - 5.5
+  - 5.6
+  - 7.0
+  - 7.1
+#  - hhvm
+
+before_script:
+  - composer self-update
+  - composer install --prefer-dist --ignore-platform-reqs
+  - composer dumpautoload -o -a
+
+script:
+  - vendor/bin/phpunit
+
+after_success:
+  # coveralls
+  - wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.0/coveralls.phar
+  - chmod +x coveralls.phar
+  - travis_retry php coveralls.phar -v
+
+  # bug work around for guzzle before 6.2.3 (https://github.com/guzzle/guzzle/issues/568)
+  - rm /tmp/guzzle-cacert.pem
+
+  # scrutinizer
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - travis_retry php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
+
+notifications:
+  email:
+    - karsten.john.gerber@googlemail.com

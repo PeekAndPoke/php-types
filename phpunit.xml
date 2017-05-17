@@ -11,10 +11,10 @@
 
         <testsuite name="unit">
             <directory suffix="Test.php">tests</directory>
-            <directory suffix="Test.php">tests/*</directory>
-            <directory suffix="Test.php">tests/*/*</directory>
-            <directory suffix="Test.php">tests/*/*/*</directory>
-            <directory suffix="Test.php">tests/*/*/*/*</directory>
+        </testsuite>
+
+        <testsuite name="functional">
+            <directory suffix="Test.php">tests</directory>
         </testsuite>
 
     </testsuites>
@@ -26,10 +26,11 @@
     </filter>
 
     <logging>
-        <log type="coverage-html" target="./tmp/coverage" charset="UTF-8"
-             yui="true" highlight="true"
-             lowUpperBound="50" highLowerBound="80"/>
-        <log type="testdox-html" target="./tmp/coverage/testdox.html" />
+        <log type="coverage-clover" target="./build/logs/clover.xml"/>
+
+        <log type="coverage-html" target="./build/coverage" charset="UTF-8" yui="true" highlight="true" lowUpperBound="50" highLowerBound="80"/>
+
+        <log type="testdox-html" target="./build/testdox/testdox.html" />
     </logging>
 
 </phpunit>

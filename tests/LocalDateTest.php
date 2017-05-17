@@ -260,7 +260,7 @@ class LocalDateTest extends TestCase
         $subject = LocalDate::raw($date);
 
         $this->assertNotSame($date, $subject->getDate(), 'getDate() must return a cloned date time object');
-        $this->assertEquals($date, $subject->getDate(), 'The returned date must have the same value');
+        $this->assertEquals($date->getTimestamp(), $subject->getTimestamp(), 'The returned date must have the same value');
     }
 
     /**
