@@ -87,6 +87,25 @@ class EnumeratedTest extends TestCase
             'Enumerating the values must work'
         );
     }
+
+    public function testFromOmnipotence()
+    {
+        self::assertSame(xxxUnitTestEnumXxx::$ONE, xxxUnitTestEnumXxx::from('ONE'), 'from() must return the same instance');
+    }
+
+    public function testMultipleEnums()
+    {
+        self::assertInstanceOf(xxxUnitTestEnumXxx::class, xxxUnitTestEnumXxx::$ONE, 'The type must be correct');
+
+        self::assertInstanceOf(xxxUnitTestEnum2Xxx::class, xxxUnitTestEnum2Xxx::$ONE, 'The type must be correct');
+    }
+
+    public function testMultipleEnumsComparison()
+    {
+        self::assertEquals(xxxUnitTestEnumXxx::$ONE->getValue(), xxxUnitTestEnum2Xxx::$ONE->getValue(), 'The string values must be equal');
+
+        self::assertNotSame(xxxUnitTestEnumXxx::$ONE, xxxUnitTestEnum2Xxx::$ONE, 'The enums must not be the same');
+    }
 }
 
 /**
@@ -102,6 +121,17 @@ class xxxUnitTestEnumXxx extends Enumerated
 }
 
 xxxUnitTestEnumXxx::init();
+
+class xxxUnitTestEnum2Xxx extends Enumerated
+{
+    /** @var xxxUnitTestEnumXxx */
+    public static $ONE;
+
+    /** @var xxxUnitTestEnumXxx */
+    public static $Two;
+}
+
+xxxUnitTestEnum2Xxx::init();
 
 /**
  * @internal

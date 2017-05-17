@@ -86,7 +86,7 @@ abstract class Enumerated implements ValueHolder
         // first we try to find the REAL values
         $enumerated = self::enumerateProps();
 
-        if (array_key_exists($value, $enumerated)) {
+        if (isset($enumerated[$value]) && $enumerated[$value] instanceof static) {
             return $enumerated[$value];
         }
 
