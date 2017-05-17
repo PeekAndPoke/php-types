@@ -69,7 +69,7 @@ abstract class Enumerated implements ValueHolder
      */
     final public static function void()
     {
-        return static::from(null);
+        return self::from(null);
     }
 
     /**
@@ -118,9 +118,9 @@ abstract class Enumerated implements ValueHolder
     /**
      * @return array|Enumerated[]
      */
-    protected static function enumerateProps()
+    private static function enumerateProps()
     {
-        return static::getReflection()->getStaticProperties();
+        return self::getReflection()->getStaticProperties();
     }
 
     /**
