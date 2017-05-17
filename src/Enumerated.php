@@ -49,7 +49,7 @@ abstract class Enumerated implements ValueHolder
      */
     final public static function init()
     {
-        $reflect = static::getReflection();
+        $reflect = self::getReflection();
         $props   = $reflect->getStaticProperties();
 
         foreach ($props as $name => $val) {
@@ -69,7 +69,7 @@ abstract class Enumerated implements ValueHolder
      */
     final public static function void()
     {
-        return static::from(null);
+        return self::from(null);
     }
 
     /**
@@ -84,7 +84,7 @@ abstract class Enumerated implements ValueHolder
         $value = (string) $value;
 
         // first we try to find the REAL values
-        $enumerated = static::enumerateProps();
+        $enumerated = self::enumerateProps();
 
         if (array_key_exists($value, $enumerated)) {
             return $enumerated[$value];
@@ -112,32 +112,22 @@ abstract class Enumerated implements ValueHolder
      */
     final public static function enumerateValues()
     {
-        return array_keys(static::enumerateProps());
+        return array_keys(self::enumerateProps());
     }
 
     /**
      * @return array|Enumerated[]
      */
-    protected static function enumerateProps()
+    final public static function enumerateProps()
     {
-        return static::getReflection()->getStaticProperties();
+        return self::getReflection()->getStaticProperties();
     }
 
     /**
      * @return \ReflectionClass
      */
-    protected static function getReflection()
+    final public static function getReflection()
     {
-        // NOTICE The static field will be initialized by each class individually!
-        //        This is different than how static class properties work!
-
-        /** @var \ReflectionClass $reflect */
-        static $reflect;
-
-        if ($reflect === null) {
-            $reflect = new \ReflectionClass(static::class);
-        }
-
-        return $reflect;
+        return new \ReflectionClass(static::class);
     }
 }
