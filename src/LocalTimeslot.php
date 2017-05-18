@@ -61,9 +61,7 @@ class LocalTimeslot
      */
     public function __toString()
     {
-        return $this->isValid()
-            ? $this->from->format() . ' - ' . $this->to->format()
-            : '';
+        return ($this->from ? $this->from->format() : '?') . ' - ' . ($this->to ? $this->to->format() : '?');
     }
 
     /**
@@ -81,12 +79,25 @@ class LocalTimeslot
      *
      * @return bool
      */
-    public function equals(LocalTimeslot $other)
+    public function equals(LocalTimeslot $other = null)
     {
-        return $this->isValid()
-               && $other->isValid()
-               && $this->from->isEqual($other->from)
-               && $this->to->isEqual($other->to);
+        if ($this === $other) {
+            return true;
+        }
+
+        return
+            // is the other there ?
+            $other !== null
+            // is the from the same ?
+            && (
+                ($this->from === null && $other->from === null) ||
+                ($this->from !== null && $this->from->isEqual($other->from))
+            )
+            // is the to the same ?
+            && (
+                ($this->to === null && $other->to === null) ||
+                ($this->to !== null && $this->to->isEqual($other->to))
+            );
     }
 
     /**
