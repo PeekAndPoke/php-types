@@ -75,13 +75,13 @@ abstract class Enumerated implements ValueHolder
     /**
      * Get Enum for the given input
      *
-     * @param string $value
+     * @param string|mixed $value
      *
      * @return static
      */
     final public static function from($value)
     {
-        $value = (string) $value;
+        $value = is_scalar($value) ? (string) $value : '';
 
         // first we try to find the REAL values
 
@@ -95,7 +95,7 @@ abstract class Enumerated implements ValueHolder
         // then we keep track of INVALID values.
         static $invalid = [];
         // take care of the called class
-        $cls = get_called_class();
+        $cls = static::class;
 
         if (! isset($invalid[$cls][$value])) {
 
@@ -130,6 +130,7 @@ abstract class Enumerated implements ValueHolder
      */
     final public static function getReflection()
     {
+        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
         return new \ReflectionClass(static::class);
     }
 }
