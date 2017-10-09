@@ -79,6 +79,18 @@ class EnumeratedTest extends TestCase
         self::assertFalse($enum->isValid(), 'The enum must NOT be valid');
     }
 
+    public function testFromStringableObject()
+    {
+        $enum = xxxUnitTestEnumXxx::from(xxxUnitTestEnumXxx::$ONE);
+
+        self::assertInstanceOf(xxxUnitTestEnumXxx::class, $enum, 'Must be an instance the enum');
+
+        self::assertSame('ONE', $enum->getValue(), 'The value must be "ONE"');
+        self::assertSame('ONE', (string) $enum, 'To string conversion must work');
+
+        self::assertTrue($enum->isValid(), 'The enum must be valid');
+    }
+
     public function testEnumerateValues()
     {
         self::assertSame(
