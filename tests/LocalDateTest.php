@@ -732,6 +732,38 @@ class LocalDateTest extends TestCase
         $this->assertEquals(-3600, $subject->getDaylightSavingShift());
     }
 
+    public function testGetDstStartOfDayPlusHoursWhenWinterTimeStarts()
+    {
+        // we start on high noon of the day when summer time ends - the day that has a 25th hour
+        $subject = new LocalDate('2017-10-29T12:00:00', 'Europe/Berlin');
+
+        // when we add 11 hours to midnight we get 10;00
+        $this->assertEquals(new LocalDate('2017-10-29T10:00:00', 'Europe/Berlin'), $subject->getStartOfDay()->modifyByHours(11));
+        // if we do it dst aware we really get 11:00
+        $this->assertEquals(new LocalDate('2017-10-29T11:00:00', 'Europe/Berlin'), $subject->getDstStartOfDayPlusHours(11));
+
+        // when we add 24+11 hours to midnight we get 10;00
+        $this->assertEquals(new LocalDate('2017-10-30T10:00:00', 'Europe/Berlin'), $subject->getStartOfDay()->modifyByHours(24 + 11));
+        // if we do it dst aware we really get 11:00
+        $this->assertEquals(new LocalDate('2017-10-30T11:00:00', 'Europe/Berlin'), $subject->getDstStartOfDayPlusHours(24 + 11));
+    }
+
+    public function testGetDstStartOfDayPlusHoursWhenSummerTimeStarts()
+    {
+        // we start on high noon of the day when winter time ends - the day that has only 23 hours
+        $subject = new LocalDate('2018-03-25T12:00:00', 'Europe/Berlin');
+
+        // when we add 11 hours to midnight we get 12;00
+        $this->assertEquals(new LocalDate('2018-03-25T12:00:00', 'Europe/Berlin'), $subject->getStartOfDay()->modifyByHours(11));
+        // if we do it dst aware we really get 11:00
+        $this->assertEquals(new LocalDate('2018-03-25T11:00:00', 'Europe/Berlin'), $subject->getDstStartOfDayPlusHours(11));
+
+        // when we add 24+11 hours to midnight we get 12;00
+        $this->assertEquals(new LocalDate('2018-03-26T12:00:00', 'Europe/Berlin'), $subject->getStartOfDay()->modifyByHours(24 + 11));
+        // if we do it dst aware we really get 11:00
+        $this->assertEquals(new LocalDate('2018-03-26T11:00:00', 'Europe/Berlin'), $subject->getDstStartOfDayPlusHours(24 + 11));
+    }
+
     public function testGetNearestStartOfDay()
     {
         $subject = new LocalDate('2016-01-01T00:00:00', 'Europe/Berlin');

@@ -5,6 +5,8 @@
 namespace PeekAndPoke\Types;
 
 /**
+ * @api
+ *
  * @author Karsten J. Gerber <kontakt@karsten-gerber.de>
  */
 class LocalTimeslot

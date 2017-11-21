@@ -4,9 +4,22 @@
  *
  * @author Karsten J. Gerber <kontakt@karsten-gerber.de>
  */
+
 namespace PeekAndPoke\Types;
 
 /**
+ * LocalDate is an enhanced date that forces construction with a timezone like Europe/Berlin
+ *
+ * The LocalDate is immutable. All modifying methods return a new instance.
+ *
+ * It also integrates with Slumber to serialize to json like
+ *
+ * { date : "2017-10-10T11:11:11+02:00", tz : "Europe/Berlin" }
+ *
+ * So the receiver (e.g. the browser) can reconstruct the date with the correct timezone
+ *
+ * @api
+ *
  * @author Karsten J. Gerber <kontakt@karsten-gerber.de>
  */
 class LocalDate
@@ -37,6 +50,7 @@ class LocalDate
 
     /**
      * @param \DateTime $dateTime
+     *
      * @return LocalDate
      */
     public static function raw(\DateTime $dateTime)
@@ -185,7 +199,7 @@ class LocalDate
     {
         $previousNoon = $this->getStartOfPreviousDay()->modifyByHours(12);
 
-        return  $this->getOffset() - $previousNoon->getOffset();
+        return $this->getOffset() - $previousNoon->getOffset();
     }
 
     //// Daylight saving time shift aware methods //////////////////////////////////////////////////////////////////////
@@ -199,12 +213,12 @@ class LocalDate
      *
      * @return LocalDate
      */
-    public function getDstStartOfDayPlusHours ($hours)
+    public function getDstStartOfDayPlusHours($hours)
     {
-        $startOfDay = $this->getStartOfDay();
+        $startOfDay       = $this->getStartOfDay();
         $startOfDayOffset = $startOfDay->getOffset();
 
-        $result = $startOfDay->modifyByHours($hours);
+        $result       = $startOfDay->modifyByHours($hours);
         $resultOffset = $result->getOffset();
 
         return $result->modifyBySeconds($startOfDayOffset)->modifyBySeconds(0 - $resultOffset);
@@ -281,9 +295,9 @@ class LocalDate
     }
 
     /**
-     * @param int   $hour
-     * @param int   $minute
-     * @param int   $second
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
      *
      * @return LocalDate
      */
@@ -307,7 +321,7 @@ class LocalDate
      */
     public function modifyBySeconds($numSeconds)
     {
-        return LocalDate::fromTimestamp(
+        return self::fromTimestamp(
             $this->getTimestamp() + (int) $numSeconds,
             $this->getTimezone()
         );
@@ -353,15 +367,15 @@ class LocalDate
         $numDays   = (int) $numDays;
         $timestamp = $this->getTimestamp() + (86400 * $numDays);
 
-        $newDate = LocalDate::fromTimestamp($timestamp, $this->timezone);
+        $newDate = self::fromTimestamp($timestamp, $this->timezone);
 
         // calculate the datetime savings offsets
         $timezoneInitialDateOffset = $this->timezone->getOffset($this->date);
-        $timezoneNewDateOffset = $this->timezone->getOffset($newDate->date);
+        $timezoneNewDateOffset     = $this->timezone->getOffset($newDate->date);
 
         // fix the new date if it's needed
         if ($timezoneInitialDateOffset !== $timezoneNewDateOffset) {
-            $newDate = LocalDate::fromTimestamp($timestamp + ($timezoneInitialDateOffset - $timezoneNewDateOffset), $this->timezone);
+            $newDate = self::fromTimestamp($timestamp + ($timezoneInitialDateOffset - $timezoneNewDateOffset), $this->timezone);
         }
 
         return $newDate;
@@ -390,7 +404,7 @@ class LocalDate
      */
     public function addInterval($interval)
     {
-        if (!$interval instanceof \DateInterval) {
+        if (! $interval instanceof \DateInterval) {
             $interval = new \DateInterval($interval);
         }
 
@@ -409,7 +423,7 @@ class LocalDate
      */
     public function subInterval($interval)
     {
-        if (!$interval instanceof \DateInterval) {
+        if (! $interval instanceof \DateInterval) {
             $interval = new \DateInterval($interval);
         }
 
@@ -433,9 +447,9 @@ class LocalDate
         // This is a work-around for the day-light-saving shift days
         // If we would use minutesIntoDay and then add those to startOfDay, we loose one hour.
         // Example would be '2015-03-29 11:20' with tz 'Europe/Berlin' would result in '2015-03-29 10:00'
-        $minutesIntoDay = ((int)$this->date->format('H') * 60) + ((int)$this->date->format('i'));
+        $minutesIntoDay = ((int) $this->date->format('H') * 60) + ((int) $this->date->format('i'));
         // cut off partial intervals
-        $corrected = ((int)($minutesIntoDay / $minutesInterval)) * $minutesInterval;
+        $corrected = ((int) ($minutesIntoDay / $minutesInterval)) * $minutesInterval;
 
         return $this->getStartOfDay()->modifyByMinutes($corrected);
     }
@@ -640,7 +654,7 @@ class LocalDate
      */
     private function ensure($input)
     {
-        if ($input instanceof LocalDate) {
+        if ($input instanceof self) {
             return $input;
         }
 

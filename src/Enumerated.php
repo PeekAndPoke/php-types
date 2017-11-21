@@ -6,6 +6,8 @@
 namespace PeekAndPoke\Types;
 
 /**
+ * @api
+ *
  * @author Karsten J. Gerber <kontakt@karsten-gerber.de>
  */
 abstract class Enumerated implements ValueHolder
