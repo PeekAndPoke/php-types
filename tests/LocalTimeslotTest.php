@@ -237,6 +237,50 @@ class LocalTimeslotTest extends TestCase
      * @param int           $days
      * @param LocalTimeslot $expected
      *
+     * @dataProvider provideTestModifyByHours
+     */
+    public function testModifyByHours(LocalTimeslot $start, $days, LocalTimeslot $expected)
+    {
+        $result = $start->modifyByHours($days);
+
+        self::assertNotSame($start, $result, 'A new instance must be created');
+
+        self::assertSame(
+            [$expected->getFrom()->format(), $expected->getTo()->format()],
+            [$result->getFrom()->format(), $result->getTo()->format()],
+            'modifyByDays must work correctly'
+        );
+    }
+
+    public function provideTestModifyByHours()
+    {
+        $baseFrom = new LocalDate('2017-03-24T12:00:00', 'Europe/Berlin');
+        $baseTo   = new LocalDate('2017-03-25T12:00:00', 'Europe/Berlin');
+
+        return [
+            [
+                LocalTimeslot::from($baseFrom, $baseTo),
+                24,
+                LocalTimeslot::from($baseFrom->modifyByHours(24), $baseTo->modifyByHours(24)),
+            ],
+            [
+                LocalTimeslot::from($baseFrom, $baseTo),
+                48,
+                LocalTimeslot::from($baseFrom->modifyByHours(48), $baseTo->modifyByHours(48)),
+            ],
+            [
+                LocalTimeslot::from($baseFrom, $baseTo),
+                72,
+                LocalTimeslot::from($baseFrom->modifyByHours(72), $baseTo->modifyByHours(72)),
+            ],
+        ];
+    }
+
+    /**
+     * @param LocalTimeslot $start
+     * @param int           $days
+     * @param LocalTimeslot $expected
+     *
      * @dataProvider provideTestModifyByDays
      */
     public function testModifyByDays(LocalTimeslot $start, $days, LocalTimeslot $expected)

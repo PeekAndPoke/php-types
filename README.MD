@@ -9,6 +9,20 @@ There are some types that PHP does not provide as part of the language, e.g.:
 
 # TODO
 
+( ) LocalDate::isSameDay
+
+( ) LocalDate::isSameWeek
+
+( ) LocalDate::isSameMonth
+
+( ) LocalDate::isSameYear
+
+( ) LocalDate::isSameDecade
+
+( ) LocalDate::isSameCentury
+
+( ) LocalDate::isSameMillennium
+
 ( ) extract all DST (daylight saving time aware methods from LocalDate)
 
 $date->dst()->getShift()

@@ -143,6 +143,21 @@ class LocalTimeslot
     }
 
     /**
+     * Creates a new instance and moves the timeslot by the given number of hours
+     *
+     * @param float $numHours
+     *
+     * @return LocalTimeslot
+     */
+    public function modifyByHours($numHours)
+    {
+        return self::from(
+            $this->from->modifyByHours($numHours),
+            $this->to->modifyByHours($numHours)
+        );
+    }
+
+    /**
      * Creates a new instance and moves the timeslot by the given number of days
      *
      * @param int $numDays
