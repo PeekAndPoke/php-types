@@ -1,3 +1,7 @@
+[![Code Coverage](https://scrutinizer-ci.com/g/PeekAndPoke/php-types/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/PeekAndPoke/psi/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/PeekAndPoke/php-types/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/PeekAndPoke/psi/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/PeekAndPoke/php-types/badges/build.png?b=master)](https://scrutinizer-ci.com/g/PeekAndPoke/psi/build-status/master)
+
 # Why PHP-Types
 
 There are some types that PHP does not provide as part of the language, e.g.:
