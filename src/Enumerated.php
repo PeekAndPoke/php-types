@@ -43,6 +43,7 @@ abstract class Enumerated implements ValueHolder
      */
     final public function __toString()
     {
+        /** @noinspection UnnecessaryCastingInspection */
         return (string) $this->value;
     }
 
@@ -83,7 +84,7 @@ abstract class Enumerated implements ValueHolder
      */
     final public static function from($value)
     {
-        $isString = is_scalar($value) || (is_object($value) && method_exists($value, '__toString'));
+        $isString = is_scalar($value) || (\is_object($value) && \method_exists($value, '__toString'));
         $value    = $isString ? (string) $value : '';
 
         // first we try to find the REAL values
