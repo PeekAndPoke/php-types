@@ -40,14 +40,14 @@ class LocalDateTest extends TestCase
         $subject = LocalDate::fromTimestamp($timestamp, $timezoneStr);
 
         $this->assertEquals(
-            $timestamp,
+            floor($timestamp),
             $subject->getTimestamp(),
             'Setting the timezone must NOT change the timestamp'
         );
 
         $this->assertEquals(
             $expected,
-            $subject->format(),
+            $subject->format('Y-m-d\TH:i:s.uP'),
             'The date must be formatted correctly'
         );
     }
@@ -58,13 +58,18 @@ class LocalDateTest extends TestCase
     public static function provideTestFromTimestamp()
     {
         return [
-            [282828282, 'Etc/UTC', '1978-12-18T11:24:42+00:00'],
-            [282828282, 'Europe/Berlin', '1978-12-18T12:24:42+01:00'],
-            [282828282, 'America/Chicago', '1978-12-18T05:24:42-06:00'],
-            [282828282, '+02:00', '1978-12-18T13:24:42+02:00'],
-            [282828282, '+02:30', '1978-12-18T13:54:42+02:30'],
-            [282828282, '-02:00', '1978-12-18T09:24:42-02:00'],
-            [282828282, '-02:30', '1978-12-18T08:54:42-02:30'],
+            [282828282, 'Etc/UTC', '1978-12-18T11:24:42.000000+00:00'],
+            [282828282.0, 'Etc/UTC', '1978-12-18T11:24:42.000000+00:00'],
+            [282828282.00, 'Etc/UTC', '1978-12-18T11:24:42.000000+00:00'],
+            [282828282.123, 'Etc/UTC', '1978-12-18T11:24:42.123000+00:00'],
+            [282828282, 'Europe/Berlin', '1978-12-18T12:24:42.000000+01:00'],
+            [282828282.123, 'Europe/Berlin', '1978-12-18T12:24:42.123000+01:00'],
+            [282828282, 'America/Chicago', '1978-12-18T05:24:42.000000-06:00'],
+            [282828282, 'America/Chicago', '1978-12-18T05:24:42.000000-06:00'],
+            [282828282, '+02:00', '1978-12-18T13:24:42.000000+02:00'],
+            [282828282, '+02:30', '1978-12-18T13:54:42.000000+02:30'],
+            [282828282, '-02:00', '1978-12-18T09:24:42.000000-02:00'],
+            [282828282, '-02:30', '1978-12-18T08:54:42.000000-02:30'],
         ];
     }
 
@@ -81,7 +86,7 @@ class LocalDateTest extends TestCase
 
         $this->assertEquals(
             $expectedString,
-            $subject->format(),
+            $subject->format('Y-m-d\TH:i:s.uP'),
             'A date created from a raw date must be formatted correctly'
         );
 
@@ -108,20 +113,26 @@ class LocalDateTest extends TestCase
      */
     public static function provideTestRaw()
     {
-        $default = date_default_timezone_get();
+        $default  = date_default_timezone_get();
 
         return [
-            [new \DateTime('1978-12-18'), $default, '1978-12-18T00:00:00+00:00'],
-            [new \DateTime('1978-12-18T12:00'), $default, '1978-12-18T12:00:00+00:00'],
-            [new \DateTime('1978-12-18T12:00:00'), $default, '1978-12-18T12:00:00+00:00'],
+            [new \DateTime('1978-12-18'), $default, '1978-12-18T00:00:00.000000+00:00'],
+            [new \DateTime('1978-12-18T12:00'), $default, '1978-12-18T12:00:00.000000+00:00'],
+            [new \DateTime('1978-12-18T12:00:00'), $default, '1978-12-18T12:00:00.000000+00:00'],
 
-            [new \DateTime('1978-12-18T12:00:00+01:00'), '+01:00', '1978-12-18T12:00:00+01:00'],
-            [new \DateTime('1978-12-18T12:00:00+01:30'), '+01:30', '1978-12-18T12:00:00+01:30'],
-            [new \DateTime('1978-12-18T12:00:00-01:00'), '-01:00', '1978-12-18T12:00:00-01:00'],
-            [new \DateTime('1978-12-18T12:00:00-01:30'), '-01:30', '1978-12-18T12:00:00-01:30'],
+            [new \DateTime('1978-12-18T12:00:00+01:00'), '+01:00', '1978-12-18T12:00:00.000000+01:00'],
+            [new \DateTime('1978-12-18T12:00:00+01:30'), '+01:30', '1978-12-18T12:00:00.000000+01:30'],
+            [new \DateTime('1978-12-18T12:00:00-01:00'), '-01:00', '1978-12-18T12:00:00.000000-01:00'],
+            [new \DateTime('1978-12-18T12:00:00-01:30'), '-01:30', '1978-12-18T12:00:00.000000-01:30'],
 
-            [new \DateTime('1978-12-18T12:00:00.000Z'), 'Etc/UTC', '1978-12-18T12:00:00+00:00'],
-            [new \DateTime('1978-12-18T12:00:00.999Z'), 'Etc/UTC', '1978-12-18T12:00:00+00:00'],
+            [new \DateTime('1978-12-18T12:00:00.0Z'), 'Etc/UTC', '1978-12-18T12:00:00.000000+00:00'],
+            [new \DateTime('1978-12-18T12:00:00.1Z'), 'Etc/UTC', '1978-12-18T12:00:00.100000+00:00'],
+            [new \DateTime('1978-12-18T12:00:00.12Z'), 'Etc/UTC', '1978-12-18T12:00:00.120000+00:00'],
+            [new \DateTime('1978-12-18T12:00:00.123Z'), 'Etc/UTC', '1978-12-18T12:00:00.123000+00:00'],
+            [new \DateTime('1978-12-18T12:00:00.1234Z'), 'Etc/UTC', '1978-12-18T12:00:00.123400+00:00'],
+            [new \DateTime('1978-12-18T12:00:00.12345Z'), 'Etc/UTC', '1978-12-18T12:00:00.123450+00:00'],
+            [new \DateTime('1978-12-18T12:00:00.123456Z'), 'Etc/UTC', '1978-12-18T12:00:00.123456+00:00'],
+            [new \DateTime('1978-12-18T12:00:00.999999Z'), 'Etc/UTC', '1978-12-18T12:00:00.999999+00:00'],
         ];
     }
 
@@ -137,14 +148,14 @@ class LocalDateTest extends TestCase
         $subject = new LocalDate($timestamp, $timezoneStr);
 
         $this->assertEquals(
-            $timestamp,
+            floor($timestamp),
             $subject->getTimestamp(),
             'Constructing from timestamp must work'
         );
 
         $this->assertEquals(
             $expected,
-            $subject->format(),
+            $subject->format('Y-m-d\TH:i:s.uP'),
             'A date constructed from timestamp must be formatted correctly'
         );
     }
@@ -175,11 +186,12 @@ class LocalDateTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $subject->format(),
+            $subject->format('Y-m-d\TH:i:s.uP'),
             'A date constructed from timestamp must be formatted correctly'
         );
 
         $this->assertEquals($subject->getTimezone()->getName(), $timezoneStr, 'The timezone must be set correctly');
+
         $this->assertEquals(
             $subject->getDate()->getTimezone()->getName(),
             $timezoneStr,
@@ -195,60 +207,91 @@ class LocalDateTest extends TestCase
         $etc         = new \DateTimeZone('Etc/UTC');
         $todayPrefix = (new \DateTime('today'))->format('Y-m-d\TH:i:s');
 
-        return [
-            [282828282, 'Etc/UTC', '1978-12-18T11:24:42+00:00'],
-            ['282828282', 'Etc/UTC', '1978-12-18T11:24:42+00:00'],
+        $tzBerlin = new \DateTimeZone('Europe/Berlin');
 
-            ['today', 'Etc/UTC', $todayPrefix . '+00:00'],
+        return [
+            [282828282, 'Etc/UTC', '1978-12-18T11:24:42.000000+00:00'],
+            [282828282.1, 'Etc/UTC', '1978-12-18T11:24:42.100000+00:00'],
+            [282828282.12, 'Etc/UTC', '1978-12-18T11:24:42.120000+00:00'],
+            [282828282.123, 'Etc/UTC', '1978-12-18T11:24:42.123000+00:00'],
+            [282828282.1234, 'Etc/UTC', '1978-12-18T11:24:42.123400+00:00'],
+            [282828282.12345, 'Etc/UTC', '1978-12-18T11:24:42.123450+00:00'],
+            [282828282.123456, 'Etc/UTC', '1978-12-18T11:24:42.123456+00:00'],
+
+            [282828282, 'Europe/Berlin', '1978-12-18T12:24:42.000000+01:00'],
+            [282828282.1, 'Europe/Berlin', '1978-12-18T12:24:42.100000+01:00'],
+            [282828282.12, 'Europe/Berlin', '1978-12-18T12:24:42.120000+01:00'],
+            [282828282.123, 'Europe/Berlin', '1978-12-18T12:24:42.123000+01:00'],
+            [282828282.1234, 'Europe/Berlin', '1978-12-18T12:24:42.123400+01:00'],
+            [282828282.12345, 'Europe/Berlin', '1978-12-18T12:24:42.123450+01:00'],
+            [282828282.123456, 'Europe/Berlin', '1978-12-18T12:24:42.123456+01:00'],
+
+            ['282828282', 'Etc/UTC', '1978-12-18T11:24:42.000000+00:00'],
+            ['282828282', 'Europe/Berlin', '1978-12-18T12:24:42.000000+01:00'],
+
+            // timestamp construction from string does not take micro-seconds into account
+            ['282828282.123', 'Etc/UTC', '1978-12-18T11:24:42.000000+00:00'],
+            ['282828282.123', 'Europe/Berlin', '1978-12-18T12:24:42.000000+01:00'],
+
+            ['today', 'Etc/UTC', $todayPrefix . '.000000+00:00'],
             // TODO: what about timezone
             //           ['today',     'America/Chicago',  $todayPrefix . '-05:00'],
-            ['today', '+02:00', $todayPrefix . '+02:00'],
-            ['today', '-02:00', $todayPrefix . '-02:00'],
+            ['today', '+02:00', $todayPrefix . '.000000+02:00'],
+            ['today', '-02:00', $todayPrefix . '.000000-02:00'],
 
-            ['1978-12-18', 'Etc/UTC', '1978-12-18T00:00:00+00:00'],
-            ['1978-12-18', 'Europe/Berlin', '1978-12-18T00:00:00+01:00'],
-            ['1978-12-18', 'America/Chicago', '1978-12-18T00:00:00-06:00'],
-            ['1978-12-18', '+02:00', '1978-12-18T00:00:00+02:00'],
-            ['1978-12-18', '-02:00', '1978-12-18T00:00:00-02:00'],
+            ['1978-12-18', 'Etc/UTC', '1978-12-18T00:00:00.000000+00:00'],
+            ['1978-12-18', 'Europe/Berlin', '1978-12-18T00:00:00.000000+01:00'],
+            ['1978-12-18', 'America/Chicago', '1978-12-18T00:00:00.000000-06:00'],
+            ['1978-12-18', '+02:00', '1978-12-18T00:00:00.000000+02:00'],
+            ['1978-12-18', '-02:00', '1978-12-18T00:00:00.000000-02:00'],
 
-            [new \DateTime('1978-12-18', $etc), 'Etc/UTC', '1978-12-18T00:00:00+00:00'],
-            [new \DateTime('1978-12-18', $etc), 'Europe/Berlin', '1978-12-18T01:00:00+01:00'],
-            [new \DateTime('1978-12-18', $etc), 'America/Chicago', '1978-12-17T18:00:00-06:00'],
+            [new \DateTime('1978-12-18', $etc), 'Etc/UTC', '1978-12-18T00:00:00.000000+00:00'],
+            [new \DateTime('1978-12-18', $etc), 'Europe/Berlin', '1978-12-18T01:00:00.000000+01:00'],
+            [new \DateTime('1978-12-18', $etc), 'America/Chicago', '1978-12-17T18:00:00.000000-06:00'],
 
-            ['1978-12-18T12:00', 'Etc/UTC', '1978-12-18T12:00:00+00:00'],
-            ['1978-12-18T12:00', 'Europe/Berlin', '1978-12-18T12:00:00+01:00'],
-            ['1978-12-18T12:00', 'America/Chicago', '1978-12-18T12:00:00-06:00'],
+            ['1978-12-18T12:00', 'Etc/UTC', '1978-12-18T12:00:00.000000+00:00'],
+            ['1978-12-18T12:00', 'Europe/Berlin', '1978-12-18T12:00:00.000000+01:00'],
+            ['1978-12-18T12:00', 'America/Chicago', '1978-12-18T12:00:00.000000-06:00'],
 
-            [new \DateTime('1978-12-18T12:00', $etc), 'Etc/UTC', '1978-12-18T12:00:00+00:00'],
-            [new \DateTime('1978-12-18T12:00', $etc), 'Europe/Berlin', '1978-12-18T13:00:00+01:00'],
-            [new \DateTime('1978-12-18T12:00', $etc), 'America/Chicago', '1978-12-18T06:00:00-06:00'],
+            [new \DateTime('1978-12-18T12:00', $etc), 'Etc/UTC', '1978-12-18T12:00:00.000000+00:00'],
+            [new \DateTime('1978-12-18T12:00', $etc), 'Europe/Berlin', '1978-12-18T13:00:00.000000+01:00'],
+            [new \DateTime('1978-12-18T12:00', $etc), 'America/Chicago', '1978-12-18T06:00:00.000000-06:00'],
 
-            ['1978-12-18T12:00:00', 'Etc/UTC', '1978-12-18T12:00:00+00:00'],
-            ['1978-12-18T12:00:00', 'Europe/Berlin', '1978-12-18T12:00:00+01:00'],
-            ['1978-12-18T12:00:00', 'America/Chicago', '1978-12-18T12:00:00-06:00'],
+            ['1978-12-18T12:00:00', 'Etc/UTC', '1978-12-18T12:00:00.000000+00:00'],
+            ['1978-12-18T12:00:00', 'Europe/Berlin', '1978-12-18T12:00:00.000000+01:00'],
+            ['1978-12-18T12:00:00', 'America/Chicago', '1978-12-18T12:00:00.000000-06:00'],
 
-            [new \DateTime('1978-12-18T12:00:00', $etc), 'Etc/UTC', '1978-12-18T12:00:00+00:00'],
-            [new \DateTime('1978-12-18T12:00:00', $etc), 'Europe/Berlin', '1978-12-18T13:00:00+01:00'],
-            [new \DateTime('1978-12-18T12:00:00', $etc), 'America/Chicago', '1978-12-18T06:00:00-06:00'],
+            [new \DateTime('1978-12-18T12:00:00', $etc), 'Etc/UTC', '1978-12-18T12:00:00.000000+00:00'],
+            [new \DateTime('1978-12-18T12:00:00', $etc), 'Europe/Berlin', '1978-12-18T13:00:00.000000+01:00'],
+            [new \DateTime('1978-12-18T12:00:00', $etc), 'America/Chicago', '1978-12-18T06:00:00.000000-06:00'],
 
-            ['1978-12-18T12:00:00+01:00', 'Etc/UTC', '1978-12-18T11:00:00+00:00'],
-            ['1978-12-18T12:00:00+01:00', 'Europe/Berlin', '1978-12-18T12:00:00+01:00'],
-            ['1978-12-18T12:00:00+01:00', 'America/Chicago', '1978-12-18T05:00:00-06:00'],
+            ['1978-12-18T12:00:00+01:00', 'Etc/UTC', '1978-12-18T11:00:00.000000+00:00'],
+            ['1978-12-18T12:00:00+01:00', 'Europe/Berlin', '1978-12-18T12:00:00.000000+01:00'],
+            ['1978-12-18T12:00:00+01:00', 'America/Chicago', '1978-12-18T05:00:00.000000-06:00'],
 
-            [new \DateTime('1978-12-18T12:00:00+0100', $etc), 'Etc/UTC', '1978-12-18T11:00:00+00:00'],
-            [new \DateTime('1978-12-18T12:00:00+01:00', $etc), 'Etc/UTC', '1978-12-18T11:00:00+00:00'],
-            [new \DateTime('1978-12-18T12:00:00+0100', $etc), 'Europe/Berlin', '1978-12-18T12:00:00+01:00'],
-            [new \DateTime('1978-12-18T12:00:00+01:00', $etc), 'Europe/Berlin', '1978-12-18T12:00:00+01:00'],
-            [new \DateTime('1978-12-18T12:00:00+0100', $etc), 'America/Chicago', '1978-12-18T05:00:00-06:00'],
-            [new \DateTime('1978-12-18T12:00:00+01:00', $etc), 'America/Chicago', '1978-12-18T05:00:00-06:00'],
+            ['1978-12-18T12:00:00.123+01:00', 'Etc/UTC', '1978-12-18T11:00:00.123000+00:00'],
+            ['1978-12-18T12:00:00.123+01:00', 'Europe/Berlin', '1978-12-18T12:00:00.123000+01:00'],
+            ['1978-12-18T12:00:00.123+01:00', 'America/Chicago', '1978-12-18T05:00:00.123000-06:00'],
 
-            ['1978-12-18T12:00:00-01:00', 'Etc/UTC', '1978-12-18T13:00:00+00:00'],
-            ['1978-12-18T12:00:00-01:00', 'Europe/Berlin', '1978-12-18T14:00:00+01:00'],
-            ['1978-12-18T12:00:00-01:00', 'America/Chicago', '1978-12-18T07:00:00-06:00'],
+            [new \DateTime('1978-12-18T12:00:00+0100', $etc), 'Etc/UTC', '1978-12-18T11:00:00.000000+00:00'],
+            [new \DateTime('1978-12-18T12:00:00+01:00', $etc), 'Etc/UTC', '1978-12-18T11:00:00.000000+00:00'],
+            [new \DateTime('1978-12-18T12:00:00+0100', $etc), 'Europe/Berlin', '1978-12-18T12:00:00.000000+01:00'],
+            [new \DateTime('1978-12-18T12:00:00+01:00', $etc), 'Europe/Berlin', '1978-12-18T12:00:00.000000+01:00'],
+            [new \DateTime('1978-12-18T12:00:00+0100', $etc), 'America/Chicago', '1978-12-18T05:00:00.000000-06:00'],
+            [new \DateTime('1978-12-18T12:00:00+01:00', $etc), 'America/Chicago', '1978-12-18T05:00:00.000000-06:00'],
 
-            [new \DateTime('1978-12-18T12:00:00-01:00', $etc), 'Etc/UTC', '1978-12-18T13:00:00+00:00'],
-            [new \DateTime('1978-12-18T12:00:00-01:00', $etc), 'Europe/Berlin', '1978-12-18T14:00:00+01:00'],
-            [new \DateTime('1978-12-18T12:00:00-01:00', $etc), 'America/Chicago', '1978-12-18T07:00:00-06:00'],
+            ['1978-12-18T12:00:00-01:00', 'Etc/UTC', '1978-12-18T13:00:00.000000+00:00'],
+            ['1978-12-18T12:00:00-01:00', 'Europe/Berlin', '1978-12-18T14:00:00.000000+01:00'],
+            ['1978-12-18T12:00:00-01:00', 'America/Chicago', '1978-12-18T07:00:00.000000-06:00'],
+
+            [new \DateTime('1978-12-18T12:00:00-01:00', $etc), 'Etc/UTC', '1978-12-18T13:00:00.000000+00:00'],
+            [new \DateTime('1978-12-18T12:00:00-01:00', $etc), 'Europe/Berlin', '1978-12-18T14:00:00.000000+01:00'],
+            [new \DateTime('1978-12-18T12:00:00-01:00', $etc), 'America/Chicago', '1978-12-18T07:00:00.000000-06:00'],
+
+
+            [new \DateTime('1978-12-18', $tzBerlin), 'Europe/Moscow', '1978-12-18T02:00:00.000000+03:00'],
+            [new \DateTime('1978-12-18T12:00', $tzBerlin), 'Europe/Moscow', '1978-12-18T14:00:00.000000+03:00'],
+            [new \DateTime('1978-12-18T12:00:00', $tzBerlin), 'Europe/Moscow', '1978-12-18T14:00:00.000000+03:00'],
         ];
     }
 
@@ -287,8 +330,8 @@ class LocalDateTest extends TestCase
         $mod = $date->modifyBySeconds($bySeconds);
 
         $this->assertEquals($expected, $mod->format(), 'Modifying a date by seconds must work');
-        $this->assertEquals((int)$bySeconds, $date->diffInSeconds($mod), 'Diff in secs must be correct');
-        $this->assertEquals((int)$bySeconds, 0 - $mod->diffInSeconds($date), 'Diff in secs must be correct');
+        $this->assertEquals((int) $bySeconds, $date->diffInSeconds($mod), 'Diff in secs must be correct');
+        $this->assertEquals((int) $bySeconds, 0 - $mod->diffInSeconds($date), 'Diff in secs must be correct');
     }
 
     /**
@@ -343,8 +386,8 @@ class LocalDateTest extends TestCase
         $mod = $date->modifyByMinutes($byMinutes);
 
         $this->assertEquals($expected, $mod->format(), 'Modifying a date by minutes must work');
-        $this->assertEquals((float)$byMinutes, $date->diffInMinutes($mod), 'Diff in mins must be correct');
-        $this->assertEquals((float)$byMinutes, 0 - $mod->diffInMinutes($date), 'Diff in mins must be correct');
+        $this->assertEquals((float) $byMinutes, $date->diffInMinutes($mod), 'Diff in mins must be correct');
+        $this->assertEquals((float) $byMinutes, 0 - $mod->diffInMinutes($date), 'Diff in mins must be correct');
     }
 
     /**
@@ -399,8 +442,8 @@ class LocalDateTest extends TestCase
         $mod = $date->modifyByHours($byHours);
 
         $this->assertEquals($expected, $mod->format(), 'Modifying a date by hours must work');
-        $this->assertEquals((float)$byHours, $date->diffInHours($mod), 'Diff in hours must be correct');
-        $this->assertEquals((float)$byHours, 0 - $mod->diffInHours($date), 'Diff in hours must be correct');
+        $this->assertEquals((float) $byHours, $date->diffInHours($mod), 'Diff in hours must be correct');
+        $this->assertEquals((float) $byHours, 0 - $mod->diffInHours($date), 'Diff in hours must be correct');
     }
 
     /**
@@ -455,8 +498,8 @@ class LocalDateTest extends TestCase
         $mod = $date->modifyByDays($byDays);
 
         $this->assertEquals($expected, $mod->format(), 'Modifying a date by days must work');
-        $this->assertEquals((float)$byDays, $date->diffInDays($mod), 'Diff in days must be correct');
-        $this->assertEquals((float)$byDays, 0 - $mod->diffInDays($date), 'Diff in days must be correct');
+        $this->assertEquals((float) $byDays, $date->diffInDays($mod), 'Diff in days must be correct');
+        $this->assertEquals((float) $byDays, 0 - $mod->diffInDays($date), 'Diff in days must be correct');
     }
 
     /**
@@ -558,28 +601,28 @@ class LocalDateTest extends TestCase
                 'Europe/London',
                 'P1D',
                 '2015-10-25T10:00:00+00:00',
-                '2015-10-23T10:00:00+01:00'
+                '2015-10-23T10:00:00+01:00',
             ],
             [
                 '2015-10-24T10:00:00+01:00',
                 'Europe/London',
                 'PT24H',
                 '2015-10-25T09:00:00+00:00',
-                '2015-10-23T10:00:00+01:00'
+                '2015-10-23T10:00:00+01:00',
             ],
             [
                 '2015-10-25T10:00:00+00:00',
                 'Europe/London',
                 'P1D',
                 '2015-10-26T10:00:00+00:00',
-                '2015-10-24T10:00:00+01:00'
+                '2015-10-24T10:00:00+01:00',
             ],
             [
                 '2015-10-25T10:00:00+00:00',
                 'Europe/London',
                 'PT24H',
                 '2015-10-26T10:00:00+00:00',
-                '2015-10-24T11:00:00+01:00'
+                '2015-10-24T11:00:00+01:00',
             ],
 
             // Test summer to winter time shift in Berlin
@@ -588,28 +631,28 @@ class LocalDateTest extends TestCase
                 'Europe/Berlin',
                 'P1D',
                 '2015-10-25T10:00:00+01:00',
-                '2015-10-23T10:00:00+02:00'
+                '2015-10-23T10:00:00+02:00',
             ],
             [
                 '2015-10-24T10:00:00+02:00',
                 'Europe/Berlin',
                 'PT24H',
                 '2015-10-25T09:00:00+01:00',
-                '2015-10-23T10:00:00+02:00'
+                '2015-10-23T10:00:00+02:00',
             ],
             [
                 '2015-10-25T10:00:00+01:00',
                 'Europe/Berlin',
                 'P1D',
                 '2015-10-26T10:00:00+01:00',
-                '2015-10-24T10:00:00+02:00'
+                '2015-10-24T10:00:00+02:00',
             ],
             [
                 '2015-10-25T10:00:00+01:00',
                 'Europe/Berlin',
                 'PT24H',
                 '2015-10-26T10:00:00+01:00',
-                '2015-10-24T11:00:00+02:00'
+                '2015-10-24T11:00:00+02:00',
             ],
 
             // Test winter to summer time shift in London
@@ -618,7 +661,7 @@ class LocalDateTest extends TestCase
                 'Europe/London',
                 'P1D',
                 '2015-03-29T10:00:00+01:00',
-                '2015-03-27T10:00:00+00:00'
+                '2015-03-27T10:00:00+00:00',
             ],
             // Test winter to summer time shift in Berlin
             [
@@ -626,7 +669,7 @@ class LocalDateTest extends TestCase
                 'Europe/Berlin',
                 'P1D',
                 '2015-03-29T10:00:00+02:00',
-                '2015-03-27T10:00:00+01:00'
+                '2015-03-27T10:00:00+01:00',
             ],
 
             // TODO: more granular tests
@@ -673,7 +716,7 @@ class LocalDateTest extends TestCase
     {
         $subject = new LocalDate('2016-01-01', 'Etc/UTC');
 
-        $this->assertEquals('2016-01-01T00:00:00+00:00', (string)$subject);
+        $this->assertEquals('2016-01-01T00:00:00+00:00', (string) $subject);
     }
 
     public function testGetOffset()
@@ -924,30 +967,30 @@ class LocalDateTest extends TestCase
     {
         $subject = new LocalDate('2016-02-08T00:00:01', 'Europe/Berlin');
         $compare = new LocalDate('2016-02-08T00:00:00', 'Europe/Berlin');
-        $this->assertEquals($compare->format('c'), $subject->min($compare)->format('c'));
+        $this->assertEquals($compare->format(), $subject->min($compare)->format());
 
         $subject = new LocalDate('2016-02-08T00:00:01', 'Europe/Berlin');
         $compare = new LocalDate('2016-02-08T00:00:02', 'Europe/Berlin');
-        $this->assertEquals($subject->format('c'), $subject->min($compare)->format('c'));
+        $this->assertEquals($subject->format(), $subject->min($compare)->format());
 
         $subject = new LocalDate('2016-02-08T00:00:01', 'Europe/Berlin');
         $compare = new \DateTime('2016-02-08T00:00:00', new \DateTimeZone('Europe/Berlin'));
-        $this->assertEquals($compare->format('c'), $subject->min($compare)->format('c'));
+        $this->assertEquals($compare->format('c'), $subject->min($compare)->format());
     }
 
     public function testMax()
     {
         $subject = new LocalDate('2016-02-08T00:00:01', 'Europe/Berlin');
         $compare = new LocalDate('2016-02-08T00:00:00', 'Europe/Berlin');
-        $this->assertEquals($subject->format('c'), $subject->max($compare)->format('c'));
+        $this->assertEquals($subject->format(), $subject->max($compare)->format());
 
         $subject = new LocalDate('2016-02-08T00:00:01', 'Europe/Berlin');
         $compare = new LocalDate('2016-02-08T00:00:02', 'Europe/Berlin');
-        $this->assertEquals($compare->format('c'), $subject->max($compare)->format('c'));
+        $this->assertEquals($compare->format(), $subject->max($compare)->format());
 
         $subject = new LocalDate('2016-02-08T00:00:01', 'Europe/Berlin');
         $compare = new \DateTime('2016-02-08T00:00:00', new \DateTimeZone('Europe/Berlin'));
-        $this->assertEquals($subject->format('c'), $subject->max($compare)->format('c'));
+        $this->assertEquals($subject->format(), $subject->max($compare)->format());
     }
 
     public function testIsBeforeOrEqual()

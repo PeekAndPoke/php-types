@@ -66,8 +66,8 @@ class LocalDate
     }
 
     /**
-     * @param \DateTime|string|float $input    The date or a string the DateTime c'tor can understand or a timestamp
-     * @param \DateTimeZone|string   $timezone The timezone or a string the DateTimeZone c'tor can understand
+     * @param \DateTime|string|float|int $input    The date or a string the DateTime c'tor can understand or a timestamp
+     * @param \DateTimeZone|string       $timezone The timezone or a string the DateTimeZone c'tor can understand
      */
     public function __construct($input, $timezone)
     {
@@ -92,20 +92,23 @@ class LocalDate
         // See the unit tests for more as well
         ////
         if ($input instanceof \DateTime) {
-            $date = (new \DateTime())
-                ->setTimestamp($input->getTimestamp())
-                ->setTimezone($timezone);
+
+            $date = (clone $input)->setTimezone($timezone);
+
         } elseif (is_numeric($input)) {
-            $date = (new \DateTime())
-                ->setTimestamp($input)
-                ->setTimezone($timezone);
+            // Handle numeric input. Special case is floats with micro second precision
+            if (\is_float($input)) {
+                $date = \DateTime::createFromFormat('U.u', sprintf('%.6f', $input));
+                $date->setTimezone($timezone);
+            } else {
+                // otherwise we handle things as integer timestamps
+                $date = (new \DateTime())->setTimestamp((int) $input)->setTimezone($timezone);
+            }
+
         } else {
-            // when we have string input, we immediately use the timezone
-            $tmp = new \DateTime($input, $timezone);
-            // we reconstruct the date time again in order to set the timezone on the inner one
-            $date = (new \DateTime())
-                ->setTimestamp($tmp->getTimestamp())
-                ->setTimezone($timezone);
+            // When we have string input, we immediately use the timezone
+            // We reconstruct the date time again in order to set the timezone on the inner one
+            $date = (new \DateTime($input, $timezone))->setTimezone($timezone);
         }
 
         $this->date     = $date;
